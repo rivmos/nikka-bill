@@ -1,4 +1,4 @@
-import appConfig from "@/config/app.config";
+import appConfig from "../config/app.config";
 import axios from "axios";
 
 const BaseService = axios.create({

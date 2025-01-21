@@ -1,10 +1,8 @@
-import Views from "./views/Views"
+import ModernLayout from "./components/layouts/ModernLayout"
 function App() {
 
   return (
-    <>
-      <Views />
-    </>
+    <ModernLayout />
   )
 }
 

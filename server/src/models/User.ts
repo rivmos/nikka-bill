@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const userSchema = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true }, // Hash this in your middleware
+    hashedPassword: { type: String, required: true }, // Hash this in your middleware
     role: { type: String, enum: ["super", "admin", "user"], required: true },
     tenant: { type: mongoose.Schema.Types.ObjectId, ref: "Tenant" }, // Null for 'super'
     permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Permission" }], // Custom permissions
