@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import { useAppSelector } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { getTenantCustomersByPhone } from "@/store/slices/customer/customerSlice";
 
 // Validation schema
 const validationSchema = Yup.object().shape({
@@ -15,7 +16,10 @@ const validationSchema = Yup.object().shape({
 
 const BillCreator = () => {
 
+  const dispatch = useAppDispatch();
+
   const productList = useAppSelector(state => state.product.list);
+  const tenant = useAppSelector(state => state.auth.user.tenant) as string;
 
   const [billItems, setBillItems] = useState<
     { code: number; name: string; quantity: number; totalPrice: number }[]
@@ -41,6 +45,11 @@ const BillCreator = () => {
     setBillItems((prev) => [...prev, newBillItem]);
     resetField();
   };
+
+  const handleGetCustomers = async (phoneNumber: string) => {
+    console.log(phoneNumber, tenant)
+    dispatch(getTenantCustomersByPhone({ phoneNumber, tenant }))
+  }
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -108,6 +117,37 @@ const BillCreator = () => {
           ))}
         </tbody>
       </table>
+
+      <Formik
+        initialValues={{ phoneNumber: "" }}
+        validationSchema={{ phoneNumber: Yup.string().matches(/^\d+$/, "Phone must be numeric") }}
+        onSubmit={(values, { resetForm }) => {
+          handleAddProduct(values.phoneNumber, resetForm);
+        }}
+      >
+        {({ errors, touched, values }) => (
+          <Form className="mb-6">
+            <div className="flex items-center space-x-4">
+              <Field
+                name="phoneNumber"
+                className="border rounded-md p-2 w-full"
+                placeholder="Enter product ID and quantity (e.g., 101 or 101*2.5)"
+                autocomplete="off"
+              />
+              <button
+                type="button"
+                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                onClick={() => handleGetCustomers(values.phoneNumber)}
+              >
+                Find Customers
+              </button>
+            </div>
+            {errors.phoneNumber && touched.phoneNumber && (
+              <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>
+            )}
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 };

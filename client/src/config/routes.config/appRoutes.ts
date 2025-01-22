@@ -19,6 +19,18 @@ const appRoutes:Route[] = [
         authority:[],
         component: lazy(() => import('@/views/app/products/list/ProductList')),
         path:'/products-list'
+    },
+    {
+        key:'customers.add',
+        authority:[],
+        component: lazy(() => import('@/views/app/customers/add/CustomerForm')),
+        path:'/add-customer'
+    },
+    {
+        key:'customer.list',
+        authority:[],
+        component: lazy(() => import('@/views/app/customers/list/CustomerList')),
+        path:'/customers-list'
     }
 ];
 

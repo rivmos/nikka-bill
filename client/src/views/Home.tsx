@@ -18,7 +18,7 @@ const Home = () => {
             <button className="text-gray-600 hover:text-gray-900 transition-colors">Features</button>
             {/* <button className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all">
             </button> */}
-            <Link to={'/signup'} className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all">
+            <Link to={'/sign-in'} className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all">
               Sign In
             </Link>
           </div>

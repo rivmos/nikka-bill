@@ -4,13 +4,13 @@ import { lazy } from "react";
 const authRoutes:Route[] = [
     {
         key:"auth.signup",
-        path:'/signup',
+        path:'/sign-up',
         component: lazy(() => import('@/views/auth/Signup')),
         authority:[],
     },
     {
         key:"auth.signin",
-        path:'/signin',
+        path:'/sign-in',
         component: lazy(() => import('@/views/auth/Login')),
         authority:[],
     }
