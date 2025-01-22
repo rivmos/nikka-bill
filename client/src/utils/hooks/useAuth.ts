@@ -1,27 +1,64 @@
 import { UserState } from "@/@types/user";
-import { apiSignIn, apiSignUp } from "@/services/AuthService";
-import { useAppDispatch } from "@/store";
-import { setUser } from "@/store/slices/auth/authSlice";
+import appConfig from "@/config/app.config";
+import { apiSignIn, apiSignOut, apiSignUp } from "@/services/AuthService";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { signInSuccess, signOutSuccess } from "@/store/slices/auth";
+import { setUser } from "@/store/slices/auth/userSlice";
+import { useNavigate } from "react-router";
+
+type SignInResponse = {
+    token: string;
+    user: UserState;
+}
 
 const useAuth = () => {
 
+    const navigate = useNavigate();
+
+    const { token, signedIn } = useAppSelector(state => state.auth.session);
+
     const dispatch = useAppDispatch();
 
+    const handleSignIn = (data: SignInResponse) => {
+        dispatch(setUser(data.user));
+        dispatch(signInSuccess(data.token));
+        navigate(appConfig.authenticatedEntryPath);
+    }
+
     const signIn = async (data: { email: string, password: string }) => {
-        const response = await apiSignIn<UserState, { email: string, password: string }>(data);
+        const response = await apiSignIn<SignInResponse, { email: string, password: string }>(data);
         if (response.data) {
-            dispatch(setUser(response.data));
+            handleSignIn(response.data);
         };
     }
 
     const signUp = async (data: UserState) => {
-        const response = await apiSignUp<UserState, UserState>(data);
+        const response = await apiSignUp<SignInResponse, UserState>(data);
         if (response.data) {
-            dispatch(setUser(response.data));
+            handleSignIn(response.data);
         };
     }
 
-    return { signIn, signUp };
+    const handleSignOut = () => {
+        dispatch(signOutSuccess());
+        dispatch(
+            setUser({
+                id: null,
+                name: '',
+                email: '',
+                permissions: [],
+                role: 'guest',
+            })
+        );
+        navigate(appConfig.unAuthenticatedEntryPath);
+    }
+
+    const signOut = async () => {
+        await apiSignOut({ token });
+        handleSignOut();
+    }
+
+    return { authenticated: signedIn && token, signIn, signUp, signOut };
 };
 
 export default useAuth;

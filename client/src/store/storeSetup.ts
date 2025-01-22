@@ -1,17 +1,39 @@
 import { configureStore } from '@reduxjs/toolkit'
-import demoReducer from './slices/demo'
-import authReducer from './slices/auth/authSlice'
+import rootReducer from './rootReducer'
+import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist'
+import storage from 'redux-persist/lib/storage/session' // defaults to localStorage for web
+ 
+
+const persistConfig = {
+  key: 'root',
+  storage,
+  whitelist: ['auth']
+}
+
+const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 export const store = configureStore({
-  reducer: {
-    demo: demoReducer,
-    auth: authReducer
-  }
-})
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+        immutableCheck: false,
+        serializableCheck: {
+            ignoredActions: [
+                FLUSH,
+                REHYDRATE,
+                PAUSE,
+                PERSIST,
+                PURGE,
+                REGISTER,
+            ],
+        },
+        devTools: process.env.NODE_ENV === 'development',
+    }),
+});
+
+export const persistor = persistStore(store);
 
 // Get the type of our store variable
 export type AppStore = typeof store
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<AppStore['getState']>
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = AppStore['dispatch']

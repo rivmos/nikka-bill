@@ -1,8 +1,8 @@
-import ModernLayout from "./components/layouts/ModernLayout"
+import Layout from "./components/layouts/Layout"
 function App() {
 
   return (
-    <ModernLayout />
+    <Layout />
   )
 }
 

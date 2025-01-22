@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import config from "../utils/config"
 import express, { Request, Response } from 'express';
 import Tenant from '../models/Tenant';
+import BlacklistedToken from '../models/BlacklistedToken';
 import jwt from 'jsonwebtoken';
 import logger from '../utils/logger';
 
@@ -41,7 +42,7 @@ usersRouter.post('/sign-up', async (req: Request, res: Response): Promise<any> =
         logger.info('User Created Successfully')
 
         const userForToken = {
-            username: user.username,
+            username: user.name,
             id: user._id,
         }
 
@@ -49,9 +50,11 @@ usersRouter.post('/sign-up', async (req: Request, res: Response): Promise<any> =
         
         res.status(201).json({
             token, user: {
+                id: savedUser.id,
                 name: savedUser.name,
                 email: savedUser.email,
-                permissions: savedUser.permissions
+                permissions: savedUser.permissions,
+                tenant: user.tenant
             }
         })
     } catch (error) {
@@ -75,39 +78,39 @@ usersRouter.post('/sign-in', async (request:Request, response:Response): Promise
     }
 
     const userForToken = {
-        username: user.username,
+        username: user.name,
         id: user._id,
     }
 
-    const token = jwt.sign(userForToken, config.JWTSECRET as string, {expiresIn: 30})
+    const token = jwt.sign(userForToken, config.JWTSECRET as string, {expiresIn: '30s'})
 
     response
         .status(200)
         .json({
             token, user: {
-                avatar: user.avatar,
-                userName: user.username,
-                authority: [],
+                id: user.id,
+                name: user.name,
                 email: user.email,
+                permissions: user.permissions,
+                tenant: user.tenant
             }
         })
 })
 
 
-// usersRouter.post('/logout', async (req, res) => {
-//     const { token } = req.body; // Assume the client sends the token to blacklist
-//     const decoded = jwt.verify(token, config.JWTSECRET);
-//     const expiryDate = new Date(); // Convert exp to milliseconds
+usersRouter.post('/sign-out', async (req, res) => {
+    const { token } = req.body; // Assume the client sends the token to blacklist
+    const expiryDate = new Date(); // Convert exp to milliseconds
 
-//     const blacklistedToken = new BlacklistedToken({
-//         token,
-//         expiryDate,
-//     });
+    const blacklistedToken = new BlacklistedToken({
+        token,
+        expiryDate,
+    });
 
-//     await blacklistedToken.save();
+    await blacklistedToken.save();
 
-//     res.status(204).end(); // No content to send back
-// });
+    res.status(204).end(); // No content to send back
+});
 
 
 export default usersRouter;

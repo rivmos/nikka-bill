@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export interface IInitialState {
+export interface DemoSliceState {
     loading: boolean,
 }
 
-const initialState: IInitialState = {
+const initialState: DemoSliceState = {
     loading: false,
 }
 
@@ -16,6 +16,6 @@ const demoSlice = createSlice({
     }
 })
 
-export const {  } = demoSlice.actions;
+export const { } = demoSlice.actions;
 
 export default demoSlice.reducer;

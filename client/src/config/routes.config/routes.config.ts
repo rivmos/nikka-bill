@@ -1,15 +1,11 @@
 import { Route } from "@/@types/routes";
 import authRoutes from "./authRoutes";
-import { lazy } from "react";
+import appRoutes from "./appRoutes";
 
 export const publicRoutes: Route[] = [
-    ...authRoutes,
-    {
-        key:'invoice.create',
-        authority:[],
-        component: lazy(() => import('@/views/app/invoices/create/CreateInvoice')),
-        path:'/create'
-    }
+    ...authRoutes
 ]
-export const protectedRoutes: Route[] = []
+export const protectedRoutes: Route[] = [
+    ...appRoutes
+]
 

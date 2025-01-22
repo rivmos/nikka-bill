@@ -15,3 +15,11 @@ export const apiSignIn = async <T, U extends Record<string, unknown>>(data: U) =
         data
     })
 }
+
+export const apiSignOut = async <T, U extends Record<string, unknown>>(data: U) => {
+    return ApiService.fetchData<T>({
+        url: '/sign-out',
+        method: 'post',
+        data
+    })
+}

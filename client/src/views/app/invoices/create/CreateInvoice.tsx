@@ -1,13 +1,7 @@
 import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-
-// Mock product list
-const products = [
-  { id: "101", name: "Rice", price: 50 },
-  { id: "102", name: "Wheat", price: 40 },
-  { id: "103", name: "Sugar", price: 30 },
-];
+import { useAppSelector } from "@/store";
 
 // Validation schema
 const validationSchema = Yup.object().shape({
@@ -20,22 +14,25 @@ const validationSchema = Yup.object().shape({
 });
 
 const BillCreator = () => {
+
+  const productList = useAppSelector(state => state.product.list);
+
   const [billItems, setBillItems] = useState<
-    { id: string; name: string; quantity: number; totalPrice: number }[]
+    { code: number; name: string; quantity: number; totalPrice: number }[]
   >([]);
 
   const handleAddProduct = (productInput: string, resetField: () => void) => {
     const [id, quantityStr] = productInput.split("*");
     const quantity = quantityStr ? parseFloat(quantityStr) : 1; // Default quantity is 1
 
-    const product = products.find((p) => p.id === id);
+    const product = productList.find((p) => p.code === Number(id));
     if (!product) {
       alert("Product ID not found!");
       return;
     }
 
     const newBillItem = {
-      id: product.id,
+      code: product.code as number,
       name: product.name,
       quantity,
       totalPrice: product.price * quantity,
@@ -101,7 +98,7 @@ const BillCreator = () => {
         <tbody>
           {billItems.map((item, index) => (
             <tr key={index} className="text-center">
-              <td className="border border-gray-300 px-4 py-2">{item.id}</td>
+              <td className="border border-gray-300 px-4 py-2">{item.code}</td>
               <td className="border border-gray-300 px-4 py-2">{item.name}</td>
               <td className="border border-gray-300 px-4 py-2">{item.quantity}</td>
               <td className="border border-gray-300 px-4 py-2">
