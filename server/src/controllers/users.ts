@@ -7,16 +7,15 @@ import BlacklistedToken from '../models/BlacklistedToken';
 import jwt from 'jsonwebtoken';
 import logger from '../utils/logger';
 
-const usersRouter = express.Router()
+const router = express.Router()
 
-
-usersRouter.post('/sign-up', async (req: Request, res: Response): Promise<any> => {
+router.post('/sign-up', async (req: Request, res: Response): Promise<any> => {
     const { name, email, password } = req.body
 
 
     try {
         // Check if the email is already used
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email }); 
         if (existingUser) {
             return res.status(400).json({ error: "Email already exists" });
         }
@@ -46,7 +45,7 @@ usersRouter.post('/sign-up', async (req: Request, res: Response): Promise<any> =
             id: user._id,
         }
 
-        const token = jwt.sign(userForToken, config.JWTSECRET as string, { expiresIn: '30s' });
+        const token = jwt.sign(userForToken, config.JWTSECRET as string, { expiresIn: '1h' });
         
         res.status(201).json({
             token, user: {
@@ -54,7 +53,8 @@ usersRouter.post('/sign-up', async (req: Request, res: Response): Promise<any> =
                 name: savedUser.name,
                 email: savedUser.email,
                 permissions: savedUser.permissions,
-                tenant: user.tenant
+                tenant: user.tenant,
+                role: user.role
             }
         })
     } catch (error) {
@@ -63,7 +63,50 @@ usersRouter.post('/sign-up', async (req: Request, res: Response): Promise<any> =
 
 })
 
-usersRouter.post('/sign-in', async (request:Request, response:Response): Promise<any> => {
+router.post('/sign-up/user', async (req: Request, res: Response): Promise<any> => {
+    const { name, email, password, tenant } = req.body
+
+
+    try {
+        // Check if the email is already used
+        const existingUser = await User.findOne({ email, tenant });
+        if (existingUser) {
+            return res.status(400).json({ error: "User already exists" });
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create a new user as Admin for this tenant
+        const user = new User({
+            name,
+            email,
+            hashedPassword,
+            role: "user",
+            tenant: tenant,
+            permissions: [],
+        });
+        const savedUser = await user.save();
+
+        logger.info('User Created Successfully')
+
+        const userForToken = {
+            id: user._id,
+            username: user.name,
+            role: user.role
+        }
+
+        const token = jwt.sign(userForToken, config.JWTSECRET as string, { expiresIn: '1h' });
+        
+        res.status(201).json(savedUser)
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+
+})
+
+
+router.post('/sign-in', async (request:Request, response:Response): Promise<any> => {
     const { email, password } = request.body
 
     const user = await User.findOne({ email })
@@ -78,11 +121,12 @@ usersRouter.post('/sign-in', async (request:Request, response:Response): Promise
     }
 
     const userForToken = {
-        username: user.name,
         id: user._id,
+        username: user.name,
+        role: user.role
     }
 
-    const token = jwt.sign(userForToken, config.JWTSECRET as string, {expiresIn: '30s'})
+    const token = jwt.sign(userForToken, config.JWTSECRET as string, {expiresIn: '1h'})
 
     response
         .status(200)
@@ -92,13 +136,14 @@ usersRouter.post('/sign-in', async (request:Request, response:Response): Promise
                 name: user.name,
                 email: user.email,
                 permissions: user.permissions,
-                tenant: user.tenant
+                tenant: user.tenant,
+                role: user.role
             }
         })
 })
 
 
-usersRouter.post('/sign-out', async (req, res) => {
+router.post('/sign-out', async (req, res) => {
     const { token } = req.body; // Assume the client sends the token to blacklist
     const expiryDate = new Date(); // Convert exp to milliseconds
 
@@ -113,4 +158,18 @@ usersRouter.post('/sign-out', async (req, res) => {
 });
 
 
-export default usersRouter;
+// Fetch users by tenant
+router.get("/users/tenant/:tenantId", async (req: Request, res: Response) => {
+    try {
+      const users = await User.find({ tenant: req.params.tenantId });
+      res.json(users);
+    } catch (error) {
+       if (error instanceof Error) {
+              res.status(400).json({ message: error.message });
+          } else {
+              res.status(400).json({ message: "An unknown error occurred" });
+          }
+    }
+  });
+
+export default router;

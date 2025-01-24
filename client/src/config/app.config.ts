@@ -7,7 +7,7 @@ export type AppConfig = {
 const appConfig: AppConfig = {
     baseUrl: 'http://localhost:9999/',
     authenticatedEntryPath: '/app',
-    unAuthenticatedEntryPath: '/signin'
+    unAuthenticatedEntryPath: '/sign-in'
 }
 
 

@@ -1,10 +1,11 @@
 import { UserState } from "@/@types/user";
 import appConfig from "@/config/app.config";
-import { apiSignIn, apiSignOut, apiSignUp } from "@/services/AuthService";
+import { apiSignIn, apiSignOut, apiSignUp, apiUserSignUp } from "@/services/AuthService";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { signInSuccess, signOutSuccess } from "@/store/slices/auth";
 import { setUser } from "@/store/slices/auth/userSlice";
 import { useNavigate } from "react-router";
+import { addNewUser } from "@/store";
 
 type SignInResponse = {
     token: string;
@@ -39,6 +40,13 @@ const useAuth = () => {
         };
     }
 
+    const userSignup = async (data: UserState) => {
+        const response = await apiUserSignUp<UserState, UserState>(data);
+        if(response.data){
+            dispatch(addNewUser(response.data));
+        }
+    }
+
     const handleSignOut = () => {
         dispatch(signOutSuccess());
         dispatch(
@@ -58,7 +66,7 @@ const useAuth = () => {
         handleSignOut();
     }
 
-    return { authenticated: signedIn && token, signIn, signUp, signOut };
+    return { authenticated: signedIn && token, signIn, signUp, userSignup, signOut };
 };
 
 export default useAuth;

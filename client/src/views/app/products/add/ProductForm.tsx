@@ -22,6 +22,7 @@ const ProductForm = () => {
     quantityInStock: 0,
     category: "",
     sku: "",
+    hsn: "",
   };
 
   const validationSchema = Yup.object({
@@ -42,6 +43,7 @@ const ProductForm = () => {
       .min(0, "Quantity cannot be negative"),
     category: Yup.string().required("Category is required"),
     sku: Yup.string().required("SKU is required"),
+    hsn: Yup.string().required("SKU is required"),
   });
 
   const handleSubmit = (values: ProductFormValues) => {
@@ -188,6 +190,22 @@ const ProductForm = () => {
             />
             <ErrorMessage
               name="sku"
+              component="div"
+              className="mt-1 text-sm text-red-600"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="hsn" className="block text-sm font-medium text-gray-700">
+              HSN
+            </label>
+            <Field
+              id="hsn"
+              name="hsn"
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+            <ErrorMessage
+              name="hsn"
               component="div"
               className="mt-1 text-sm text-red-600"
             />

@@ -1,7 +1,10 @@
 import express, { Request, Response } from "express";
 import Customer from "../models/Customer";
+import { verifyAccessToken } from "../utils/middlewares/auth";
 
 const router = express.Router();
+
+router.use(verifyAccessToken);
 
 // Create a new customer
 router.post("/", async (req: Request, res: Response) => {

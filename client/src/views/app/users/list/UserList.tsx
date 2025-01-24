@@ -1,22 +1,22 @@
 import { useAppDispatch, useAppSelector } from '@/store'
-import { getTenantProducts } from '@/store/slices/product/productSlice';
+import { getTenantUsers } from '@/store'
 import { useEffect } from 'react'
 import { Link } from 'react-router'
 
 const ProductList = () => {
 
     const dispatch = useAppDispatch();
-    const productList = useAppSelector(state => state.product.list);
+    const userList = useAppSelector(state => state.user.list);
     const tenant = useAppSelector(state => state.auth.user.tenant) as string;
 
     useEffect(() => {
-        dispatch(getTenantProducts({ tenant }))
+        dispatch(getTenantUsers({ tenant }))
     }, [])
 
     return (
         <div>
-            {productList.length ? JSON.stringify(productList) : null}
-            <Link to={'/add-product'}>Add Product</Link>
+            {userList.length ? JSON.stringify(userList) : null}
+            <Link to={'/sign-up/user'}>Add User</Link>
         </div>
     )
 }

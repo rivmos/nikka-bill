@@ -10,6 +10,7 @@ interface IProduct extends Document {
   tenant: Types.ObjectId; // Associated company (tenant)
   category?: string; // Optional product category
   sku?: string; // Stock Keeping Unit (unique identifier)
+  hsn?: string; // Stock Keeping Unit (unique identifier)
   createdBy: Types.ObjectId; // User who created the product
   updatedBy?: Types.ObjectId; // User who last updated the product
   createdAt: Date;
@@ -60,6 +61,10 @@ const productSchema = new Schema<IProduct>(
       type: String,
       unique: true,
       sparse: true, // Allows null but enforces uniqueness
+    },
+    hsn: {
+      type: String,
+      required: true,
     },
     createdBy: {
       type: Schema.Types.ObjectId,

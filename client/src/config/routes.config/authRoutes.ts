@@ -5,13 +5,19 @@ const authRoutes:Route[] = [
     {
         key:"auth.signup",
         path:'/sign-up',
-        component: lazy(() => import('@/views/auth/Signup')),
+        component: lazy(() => import('@/views/auth/CompanySignUp')),
         authority:[],
     },
     {
         key:"auth.signin",
         path:'/sign-in',
-        component: lazy(() => import('@/views/auth/Login')),
+        component: lazy(() => import('@/views/auth/SignIn')),
+        authority:[],
+    },
+    {
+        key:"auth.signup.user",
+        path:'/sign-up/user',
+        component: lazy(() => import('@/views/auth/UserSignup')),
         authority:[],
     }
 ];

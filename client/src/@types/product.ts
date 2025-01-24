@@ -9,6 +9,7 @@ export type ProductState = {
     tenant: string; // Associated company (tenant)
     category?: string; // Optional product category
     sku?: string; // Stock Keeping Unit (unique identifier)
+    hsn?: string; // Stock Keeping Unit (unique identifier)
     createdBy: string; // User who created the product
     updatedBy?: string; // User who last updated the product
     createdAt: Date;

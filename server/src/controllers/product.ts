@@ -1,12 +1,15 @@
 import express, { Request, Response } from "express";
 import Product from "../models/Product";
+import { checkRole, verifyAccessToken } from "../utils/middlewares/auth";
 
 const router = express.Router();
+
+router.use(verifyAccessToken);
 
 // Create a new product
 router.post("/", async (req: Request, res: Response): Promise<any> => {
     try {
-        const { code, name, description, price, currency, quantityInStock, tenant, category, sku, createdBy } = req.body;
+        const { code, name, description, price, currency, quantityInStock, tenant, category, sku, hsn, createdBy } = req.body;
 
         const codeAlreadyExists =  await Product.findOne({ code });
 
@@ -24,6 +27,7 @@ router.post("/", async (req: Request, res: Response): Promise<any> => {
             tenant,
             category,
             sku,
+            hsn,
             createdBy,
         });
 
@@ -70,11 +74,11 @@ router.get("/:id", async (req: Request, res: Response):Promise<any> => {
 // Update a product
 router.put("/:id", async (req: Request, res: Response):Promise<any> => {
     try {
-        const { code, name, description, price, currency, quantityInStock, tenant, category, sku, updatedBy } = req.body;
+        const { code, name, description, price, currency, quantityInStock, tenant, category, sku, hsn, updatedBy } = req.body;
 
         const updatedProduct = await Product.findByIdAndUpdate(
             req.params.id,
-            { code, name, description, price, currency, quantityInStock, tenant, category, sku, updatedBy },
+            { code, name, description, price, currency, quantityInStock, tenant, category, sku, hsn, updatedBy },
             { new: true }
         );
 
@@ -105,7 +109,7 @@ router.delete("/:id", async (req: Request, res: Response):Promise<any> => {
 });
 
 // Fetch products by tenant
-router.get("/tenant/:tenantId", async (req: Request, res: Response) => {
+router.get("/tenant/:tenantId", checkRole(['admin']), async (req: Request, res: Response) => {
     try {
         const products = await Product.find({ tenant: req.params.tenantId });
         // const products = await Product.find({ tenant: req.params.tenantId }).populate("tenant createdBy updatedBy");

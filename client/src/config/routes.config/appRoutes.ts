@@ -27,10 +27,16 @@ const appRoutes:Route[] = [
         path:'/add-customer'
     },
     {
-        key:'customer.list',
+        key:'customers.list',
         authority:[],
         component: lazy(() => import('@/views/app/customers/list/CustomerList')),
         path:'/customers-list'
+    },
+    {
+        key:'users.list',
+        authority:[],
+        component: lazy(() => import('@/views/app/users/list/UserList')),
+        path:'/users-list'
     }
 ];
 

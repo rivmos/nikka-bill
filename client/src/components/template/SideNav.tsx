@@ -18,11 +18,11 @@ const SideNav = () => {
                     },
                 }}
             >
+                <MenuItem component={<Link to="/invoice-list" />}>Invoices</MenuItem>
                 <MenuItem component={<Link to="/create-invoice" />}>Create Invoice</MenuItem>
                 <MenuItem component={<Link to="/products-list" />}>Products</MenuItem>
                 <MenuItem component={<Link to="/customers-list" />}>Customers</MenuItem>
-                <MenuItem component={<Link to="/clients" />}>Clients</MenuItem>
-                <MenuItem component={<Link to="/invoices" />}>Invoices</MenuItem>
+                <MenuItem component={<Link to="/users-list" />}>Users</MenuItem>
                 <MenuItem onClick={signOut}>Logout</MenuItem>
                 {/* <MenuItem component={<Link to="/calendar" />}> Calendar</MenuItem>
                 <MenuItem component={<Link to="/e-commerce" />}> E-commerce</MenuItem> */}
