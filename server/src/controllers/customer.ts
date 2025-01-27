@@ -148,41 +148,43 @@ router.get("/search", async (req: Request, res: Response) => {
 
 // Find customer by phone number
 
-  router.get(
-    "/phone/:phoneNumber",
-    async (req: Request, res: Response):Promise<any> => {
-      try {
-        const { phoneNumber } = req.params;
-        const { tenant } = req.query; // Assuming tenantId is provided as a query parameter
-  
-        if (!tenant) {
-          return res
-            .status(400)
-            .json({ message: "Tenant ID is required for this operation" });
-        }
-  
-        // Find customer for the specific tenant where phone array contains the given number
-        const customer = await Customer.findOne({
-          phone: phoneNumber,
-          tenant: tenant,
-        }).populate("tenant createdBy updatedBy");
-  
-        if (!customer) {
-          return res
-            .status(404)
-            .json({ message: "Customer not found with the provided phone number" });
-        }
-  
-        res.json(customer);
-      } catch (error) {
-        if (error instanceof Error) {
-            res.status(400).json({ message: error.message });
-        } else {
-            res.status(400).json({ message: "An unknown error occurred" });
-        }
+router.get(
+  "/phone/:phoneNumber",
+  async (req: Request, res: Response): Promise<any> => {
+    try {
+      const { phoneNumber } = req.params;
+      const { tenant } = req.query; // Assuming tenantId is provided as a query parameter
+
+      if (!tenant) {
+        return res
+          .status(400)
+          .json({ message: "Tenant ID is required for this operation" });
+      }
+
+      // Find all customers for the specific tenant where phone array contains the given number
+      const customers = await Customer.find({
+        phone: phoneNumber,
+        tenant: tenant,
+      }).populate("tenant createdBy updatedBy");
+
+      if (customers.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No customers found with the provided phone number" });
+      }
+
+      // Return all matching customers
+      res.json(customers);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(400).json({ message: "An unknown error occurred" });
       }
     }
-  );
+  }
+);
+
   
   
 
